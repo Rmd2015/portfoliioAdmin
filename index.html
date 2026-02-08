@@ -1,692 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aymen mssd | High-Ticket Video Content Partner</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard | Portfolio</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <style>
-    :root { --accent:#8b5cf6; --bg:#000; --card:#0a0a0a; }
-
-    body{
-      font-family:'Plus Jakarta Sans',sans-serif;
-      color:#fff;
-      scroll-behavior:smooth;
-      background: radial-gradient(ellipse at 10% 20%, rgba(139,92,246,0.18) 0%, transparent 40%),
-        radial-gradient(ellipse at 80% 70%, rgba(168,85,247,0.14) 0%, transparent 50%),
-        radial-gradient(circle at 30% 80%, rgba(124,58,237,0.11) 0%, transparent 45%),
-        linear-gradient(135deg,#0f001a 0%,#050014 50%,#0a001f 100%);
-      background-attachment:fixed;
-      min-height:100vh;
-    }
-
-    .glow-bg{
-      position:fixed; inset:0; pointer-events:none; z-index:-2;
-      background:
-        radial-gradient(circle at 30% 20%, rgba(139,92,246,0.08) 0%, transparent 50%),
-        radial-gradient(circle at 70% 80%, rgba(168,85,247,0.06) 0%, transparent 60%);
-      opacity:.9;
-    }
-
-    .hidden{display:none!important;}
-
-    ::-webkit-scrollbar{height:6px;width:6px;}
-    ::-webkit-scrollbar-track{background:#000;}
-    ::-webkit-scrollbar-thumb{background:#222;border-radius:10px;}
-    ::-webkit-scrollbar-thumb:hover{background:var(--accent);}
-
-    .video-item{
-      background:var(--card);
-      border-radius:16px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.06);
-      transition:all .35s ease;
-      position:relative;
-      cursor:pointer;
-    }
-    .video-item:hover{border-color:rgba(139,92,246,0.8); transform:translateY(-4px);}
-    iframe{width:100%;height:100%;border:0;}
-
-    .tab-btn{
-      padding:9px 18px;border-radius:14px;font-size:12px;font-weight:800;
-      color:#71717a;transition:all .25s ease;white-space:nowrap;
-    }
-    .tab-btn.active{
-      background:var(--accent);color:#fff;box-shadow:0 10px 30px rgba(139,92,246,0.18);
-    }
-
-    .fade-in{animation:fadeIn .8s ease forwards;opacity:0;transform:translateY(10px);}
-    @keyframes fadeIn{to{opacity:1;transform:translateY(0);}}
-
-    .social-btn{
-      width:52px;height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center;
-      background:#0b0b0b;border:1px solid rgba(255,255,255,0.06);transition:all .25s ease;
-    }
-    .social-btn:hover{border-color:rgba(139,92,246,0.55);transform:translateY(-2px);}
-    .social-btn svg{width:22px;height:22px;opacity:.95;}
-
-    .subtab-btn{
-      padding:8px 16px;border-radius:12px;font-size:13px;font-weight:700;
-      background:#111;color:#aaa;border:1px solid #222;transition:all .25s;
-    }
-    .subtab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-
-    .long-grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:18px;}
-    @media (min-width:768px){.long-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;}}
- 
-
-    .shorts-grid-wrapper{max-height: calc((100vw / 4) * (16/9) * 2 + 24px);overflow-y:auto;padding-right:2px;}
-    .shorts-grid{display:grid;gap:16px;grid-template-columns:repeat(2,minmax(0,1fr));}
-    @media (min-width:640px){.shorts-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-    @media (min-width:1024px){.shorts-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
-
-    .yt-thumb{
-      width:100%;height:100%;position:absolute;inset:0;background-size:cover;background-position:center;
-      cursor:pointer;z-index:1;
-    }
-    .yt-thumb::after{
-      content:"";position:absolute;inset:0;
-      background:linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0.05));
-      z-index:1;
-    }
-
-    .play-btn{
-      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-      z-index:5;pointer-events:none;
-    }
-    .play-btn span{
-      width:64px;height:64px;border-radius:999px;background:rgba(0,0,0,0.55);
-      border:1px solid rgba(255,255,255,0.12);
-      display:flex;align-items:center;justify-content:center;
-      backdrop-filter: blur(6px);
-      transition:transform .2s ease;
-      z-index:2;
-    }
-    .video-item:hover .play-btn span{transform:scale(1.05);}
-    .play-btn svg{width:26px;height:26px;margin-left:3px;fill:white;opacity:.95;}
-
-    .skeleton{
-      position:absolute;inset:0;
-      background:linear-gradient(90deg,#0b0b0b 0%,#141414 45%,#0b0b0b 100%);
-      background-size:200% 100%;
-      animation: shimmer 1.3s infinite linear;
-      z-index:3;
-    }
-    @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-
-    .mute-btn{
-      position:absolute;top:14px;right:14px;z-index:50;padding:10px 12px;border-radius:14px;
-      background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.08);
-      display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;letter-spacing:.04em;
-      text-transform:uppercase;transition:all .2s ease;backdrop-filter: blur(10px);
-    }
-    .mute-btn:hover{border-color:rgba(139,92,246,0.6);transform:scale(1.02);}
-    .mute-btn svg{width:18px;height:18px;fill:white;opacity:.95;}
-
-    .badge-long,.badge-short{
-      position:absolute;left:14px;top:14px;z-index:50;padding:8px 10px;border-radius:999px;
-      background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.08);
-      font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
-      backdrop-filter: blur(10px);color:#fff;opacity:.95;
-    }
-  </style>
+<style>
+:root{ --accent:#8b5cf6; }
+body{ font-family:'Plus Jakarta Sans',sans-serif; background: radial-gradient(circle at 20% 10%, rgba(139,92,246,0.18) 0%, transparent 45%), radial-gradient(circle at 80% 80%, rgba(168,85,247,0.12) 0%, transparent 55%), linear-gradient(135deg,#0f001a 0%,#050014 50%,#0a001f 100%); min-height:100vh; color:#fff; }
+.admin-wrap{ background: rgba(10,10,10,0.65); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(14px); border-radius: 24px; padding: 18px; }
+.admin-input,.admin-select{ width:100%; background:#070707; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:12px 14px; color:#fff; outline:none; transition:all .2s ease; font-weight:700; font-size:14px; }
+.admin-input:focus,.admin-select:focus{ border-color: rgba(139,92,246,0.65); box-shadow: 0 0 0 3px rgba(139,92,246,0.16); }
+.admin-label{ font-size: 11px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 8px; display:block; }
+.btn-pro{ border-radius: 16px; padding: 12px 16px; font-size: 13px; font-weight: 900; letter-spacing: .02em; transition: all .2s ease; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: white; display:inline-flex; align-items:center; justify-content:center; gap:8px; user-select:none; }
+.btn-pro:hover{ transform: translateY(-1px); border-color: rgba(139,92,246,0.55); background: rgba(139,92,246,0.12); }
+.btn-pro:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+.btn-primary{ background: var(--accent); border-color: rgba(139,92,246,0.7); box-shadow:0 18px 40px rgba(139,92,246,0.14); }
+.btn-primary:hover{ background:#7c3aed;border-color:#7c3aed; }
+.btn-danger{ background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); }
+.btn-danger:hover{ background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.5); }
+.btn-neutral{ background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.10); }
+.btn-neutral:hover{ background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+.admin-item{ border:1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.35); border-radius: 20px; padding: 14px; }
+.admin-pill{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background: rgba(139,92,246,0.10); border:1px solid rgba(139,92,246,0.18); color:#ddd; font-size:12px; font-weight:900; }
+.inline-edit{ margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; display:grid; gap: 10px; }
+.thumb{ width: 160px; height: 90px; border-radius: 16px; overflow:hidden; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); flex: 0 0 auto; position: relative; }
+.thumb img{ width:100%; height:100%; object-fit: cover; display:block; transform: scale(1.01); }
+.thumb::after{ content:""; position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.55), transparent 60%); pointer-events:none; }
+.hidden{display:none!important;}
+</style>
 </head>
 
-<body class="antialiased overflow-x-hidden">
-  <div class="glow-bg"></div>
+<body class="p-6 md:p-10">
+<div class="max-w-6xl mx-auto space-y-6">
 
-  <!-- HERO -->
-  <section class="relative z-10 min-h-screen flex items-center px-6 md:px-20 py-20">
-    <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-14 items-center">
-      <div class="space-y-7 text-center md:text-left fade-in" style="animation-delay:.1s;">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg border border-purple-500/20 bg-purple-500/5 text-purple-400 text-[10px] font-extrabold tracking-[0.25em] uppercase">
-          High-Ticket Content Partner
-        </div>
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div>
+    <div class="text-purple-400 text-[10px] font-extrabold tracking-[0.35em] uppercase">Admin Dashboard</div>
+    <h1 class="text-3xl md:text-4xl font-extrabold mt-2">Manage Portfolio Videos</h1>
+    <p class="text-zinc-400 mt-2">Toutes les actions sont synchronisées en temps réel avec <b>Portfolio</b>.</p>
+  </div>
+  <div class="flex gap-3">
+    <a href="index.html" class="btn-pro btn-neutral">Open Portfolio</a>
+    <button onclick="logout()" class="btn-pro btn-neutral">Logout</button>
+  </div>
+</div>
 
-        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
-          <span class="block">Grow on social media</span>
-          <span style="color: var(--accent);">Make more leads.</span>
-        </h1>
+<div id="loginBox" class="admin-wrap max-w-md">
+  <h2 class="text-xl font-extrabold">Admin Login</h2>
+  <p class="text-zinc-400 text-sm mt-1">Accès réservé</p>
+  <div class="mt-4 space-y-3">
+    <input id="pw" type="password" class="admin-input" placeholder="Mot de passe" />
+    <button class="btn-pro btn-primary w-full" onclick="login()">Se connecter</button>
+  </div>
+</div>
 
-        <div class="mt-5 space-y-2 text-xl sm:text-2xl">
-          <p class="text-white font-semibold">
-            Aymen — pro editor <span class="text-purple-400">3+ years</span>
-          </p>
-          <p class="text-zinc-300">
-            Premium storytelling that <span class="text-purple-400">converts attention</span>
-          </p>
-        </div>
+<div id="dash" class="hidden space-y-6">
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
-          <button onclick="scrollToWork()"
-            class="w-full sm:w-auto bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-7 py-3.5 rounded-2xl font-extrabold text-sm transition-all duration-300 shadow-lg shadow-purple-500/20">
-            See Professional Work
-          </button>
-          <a href="#contact"
-            class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white px-7 py-3.5 rounded-2xl font-extrabold text-sm transition-all duration-300 border border-white/5 text-center">
-            Scale Your Content
-          </a>
-        </div>
-
-        <div class="flex gap-4 justify-center md:justify-start pt-4">
-          <a class="social-btn" href="https://x.com/aymenmssd123" target="_blank">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M17.5 3H21L13.3 11.8L22.4 21H15.4L9.9 15.2L4.8 21H1.3L9.6 11.4L0.9 3H8.1L13 8.2L17.5 3Z" fill="white"/></svg>
-          </a>
-          <a class="social-btn" href="https://instagram.com/aymen_mssd/" target="_blank">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M7 2H17C19.76 2 22 4.24 22 7V17C22 19.76 19.76 22 17 22H7C4.24 22 2 19.76 2 17V7C2 4.24 4.24 2 7 2Z" stroke="#ff3d00" stroke-width="2"/><path d="M12 16.2C14.3196 16.2 16.2 14.3196 16.2 12C16.2 9.6804 14.3196 7.8 12 7.8C9.6804 7.8 7.8 9.6804 7.8 12C7.8 14.3196 9.6804 16.2 12 16.2Z" stroke="#ff3d00" stroke-width="2"/><path d="M17.5 6.6H17.51" stroke="#ff3d00" stroke-width="3" stroke-linecap="round"/></svg>
-          </a>
-          <a class="social-btn" href="mailto:aymenmessdz31@gmail.com" target="_blank">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6H20V18H4V6Z" stroke="#3b82f6" stroke-width="2"/><path d="M4 7L12 13L20 7" stroke="#3b82f6" stroke-width="2"/></svg>
-          </a>
-          <a class="social-btn" href="https://wa.me/+213553667383" target="_blank">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M20.5 11.5C20.5 16.1944 16.6944 20 12 20C10.6 20 9.28 19.68 8.1 19.1L3.5 20.5L4.9 15.9C4.32 14.72 4 13.4 4 12C4 7.3056 7.8056 3.5 12.5 3.5C16.85 3.5 20.5 7.15 20.5 11.5Z" fill="#22c55e" opacity="0.95"/><path d="M10.2 9.2C10.45 8.9 10.7 8.9 10.95 9.15L11.6 9.9C11.8 10.1 11.85 10.35 11.7 10.6L11.35 11.2C11.2 11.45 11.25 11.65 11.4 11.85C12 12.8 12.85 13.55 13.85 14.1C14.05 14.2 14.25 14.2 14.4 14L15 13.35C15.2 13.15 15.45 13.1 15.7 13.25L16.55 13.75C16.85 13.9 16.9 14.2 16.75 14.45C16.35 15.15 15.65 15.55 14.85 15.4C12.3 14.95 9.2 11.95 8.7 9.55C8.55 8.75 9 8.05 9.7 7.7C9.9 7.6 10.05 7.7 10.2 7.85Z" fill="#0b0b0b"/></svg>
-          </a>
-        </div>
-      </div>
-
-      <div class="flex justify-center md:justify-end fade-in" style="animation-delay:.25s;">
-        <div class="relative w-52 h-52 sm:w-64 sm:h-64 md:w-80 md:h-80">
-          <div class="absolute inset-0 border border-purple-500/20 rounded-[28px] rotate-3"></div>
-          <img src="assets/aymen-photo.jpg" alt="Aymen mssd"
-            class="absolute inset-0 w-full h-full object-cover rounded-[28px] shadow-2xl border border-white/5 bg-zinc-900">
-        </div>
-      </div>
+<div class="admin-wrap">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-extrabold">Add Video</h2>
+      <p class="text-zinc-400 text-sm mt-1">YouTube ID + category + option + title.</p>
     </div>
-  </section>
+    <p id="status" class="text-xs text-zinc-400"></p>
+  </div>
 
-  <!-- WORK -->
-  <section id="work" class="relative z-10 py-20 px-6 md:px-20 bg-[#030303] border-t border-white/5">
-    <div class="max-w-6xl mx-auto">
-
-      <div class="flex flex-col md:flex-row items-center justify-between mb-12 gap-8">
-        <div class="text-center md:text-left">
-          <h2 class="text-purple-500 text-[10px] font-extrabold tracking-[0.4em] uppercase mb-2">High-End Portfolio</h2>
-          <h3 class="text-2xl md:text-3xl font-extrabold">Professional Showcase</h3>
-          <p class="text-zinc-500 text-sm mt-2 max-w-lg">
-            Focused on ROI-driven content. Clean edits, professional pacing, and premium sound design for top-tier creators.
-          </p>
-        </div>
-
-        <div class="flex bg-zinc-900/80 p-1 rounded-2xl border border-white/5">
-          <button onclick="switchTab('shorts')" id="tab-shorts" class="tab-btn active">Short Form</button>
-          <button onclick="switchTab('long')" id="tab-long" class="tab-btn">Documentary/Long</button>
-        </div>
-      </div>
-
-      <!-- SUBTABS -->
-      <div class="flex justify-center md:justify-start mb-6 gap-3 flex-wrap">
-        <button class="subtab-btn active" id="subtab-short-talking" onclick="switchSubTab('short-talking')">Short – Talking Head</button>
-        <button class="subtab-btn" id="subtab-short-realestate" onclick="switchSubTab('short-realestate')">Short – Real Estate</button>
-
-        <button class="subtab-btn hidden" id="subtab-long-talking" onclick="switchSubTab('long-talking')">Long – Talking Head</button>
-        <button class="subtab-btn hidden" id="subtab-long-documentary" onclick="switchSubTab('long-documentary')">Long – Documentary</button>
-      </div>
-
-      <div id="portfolio-container">
-        <!-- SHORTS -->
-        <div id="shorts-wrapper">
-          <div class="shorts-grid-wrapper">
-            <div id="shorts-content" class="shorts-grid transition-all duration-500"></div>
-          </div>
-        </div>
-
-        <!-- LONG FORM -->
-        <div id="long-content" class="hidden long-grid transition-all duration-500"></div>
-      </div>
-
-      <p id="live-status" hidden class="mt-6 text-xs text-zinc-500"></p>
-
+  <div class="grid md:grid-cols-4 gap-4 mt-6">
+    <div>
+      <label class="admin-label">Title</label>
+      <input id="add-title" class="admin-input" placeholder="Example: Real Estate Hook Edit" />
     </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="relative z-10 py-20 px-6 md:px-20 border-t border-white/5">
-    <div class="max-w-6xl mx-auto">
-      <div class="bg-zinc-950 border border-white/5 rounded-3xl p-8 md:p-12">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <div>
-            <h4 class="text-2xl md:text-3xl font-extrabold">Ready to scale?</h4>
-            <p class="text-zinc-400 mt-2 max-w-xl">
-              I only work with serious creators who value quality and reliability. Let's discuss your project goals.
-            </p>
-          </div>
-          <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-            <a href="https://wa.me/213553667383" target="_blank"
-              class="w-full md:w-auto text-center bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-7 py-3.5 rounded-2xl font-extrabold text-sm transition-all duration-300">
-              WhatsApp Me
-            </a>
-            <a href="mailto:aymenmessdz31@gmail.com"
-              class="w-full md:w-auto text-center bg-zinc-900 hover:bg-zinc-800 text-white px-7 py-3.5 rounded-2xl font-extrabold text-sm transition-all duration-300 border border-white/5">
-              Professional Email
-            </a>
-          </div>
-        </div>
-      </div>
+    <div>
+      <label class="admin-label">YouTube Video ID</label>
+      <input id="add-youtube" class="admin-input" placeholder="Example: z6JMaEGuCjY" />
     </div>
-  </section>
+    <div>
+      <label class="admin-label">Category</label>
+      <select id="add-category" class="admin-select" onchange="syncOptionsForAdd()">
+        <option value="shorts">Short Form</option>
+        <option value="long">Long Form</option>
+      </select>
+    </div>
+    <div>
+      <label class="admin-label">Option</label>
+      <select id="add-option" class="admin-select"></select>
+    </div>
+  </div>
 
-  <footer class="py-12 text-center text-zinc-600 text-[10px] tracking-widest border-t border-white/5 uppercase">
-    © 2026 Aymen mssd <span class="mx-2">|</span> High-Ticket Content Partner
-  </footer>
+  <div class="flex flex-col sm:flex-row gap-3 mt-4">
+    <button class="btn-pro btn-primary w-full sm:w-auto" onclick="addVideo()">+ Add Video</button>
+    <button class="btn-pro btn-neutral w-full sm:w-auto" onclick="refreshVideos()">Refresh</button>
+  </div>
+</div>
 
-  <!-- YT API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
+<div class="admin-wrap">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-extrabold">Current Videos</h2>
+      <p class="text-zinc-400 text-sm mt-1">Grouped by Category + Option with position relative to group.</p>
+    </div>
+    <p id="count" class="text-xs text-zinc-400"></p>
+  </div>
 
-  <script>
-    /* ============================================================
-      1) SUPABASE CONFIG
-    ============================================================ */
-    const SUPABASE_URL = "https://ajubgliywevrwafnhdyv.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_iuCPHxztz0y9pgbQT5m1UQ_asgQAb7f";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <div id="admin-list" class="mt-6 grid gap-4"></div>
+</div>
 
-    /* ============================================================
-      2) CATEGORY OPTIONS (same as admin)
-    ============================================================ */
-    const CATEGORY_OPTIONS = {
-      shorts: [
-        { value: "short-talking", label: "Short – Talking Head", badge: "Talking Head" },
-        { value: "short-realestate", label: "Short – Real Estate", badge: "Real Estate" },
-      ],
-      long: [
-        { value: "long-talking", label: "Long – Talking Head", badge: "Talking Head" },
-        { value: "long-documentary", label: "Long – Documentary", badge: "Documentary" },
-      ]
-    };
+</div>
+</div>
 
-    /* ============================================================
-      3) STATE
-    ============================================================ */
-    let videos = [];
-    let players = [];
-    let currentTab = "shorts";
-    let currentSubTab = "short-talking";
+<script>
+const SUPABASE_URL="https://ajubgliywevrwafnhdyv.supabase.co";
+const SUPABASE_KEY="sb_publishable_iuCPHxztz0y9pgbQT5m1UQ_asgQAb7f";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-    /* ============================================================
-      4) YOUTUBE PLAYER HELPERS
-    ============================================================ */
-    function pauseAllVideos(exceptPlayer = null) {
-      players.forEach(p => {
-        try { if (p && p.pauseVideo && p !== exceptPlayer) p.pauseVideo(); } catch(e){}
-      });
-    }
+const CATEGORY_OPTIONS={
+  shorts:[{value:"short-talking",label:"Short – Talking Head",badge:"Talking Head"},{value:"short-realestate",label:"Short – Real Estate",badge:"Real Estate"}],
+  long:[{value:"long-talking",label:"Long – Talking Head",badge:"Talking Head"},{value:"long-documentary",label:"Long – Documentary",badge:"Documentary"}]
+};
 
-    function buildYTPlayer(iframeEl, onReadyCb = null) {
-      if (!iframeEl.id) iframeEl.id = "player-" + Math.random().toString(16).slice(2);
+function getBadgeText(category,option){ const opt=CATEGORY_OPTIONS[category]?.find(o=>o.value===option); return opt?.badge||"Video"; }
+function getYoutubeThumb(id){ return { max:`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`, hq:`https://i.ytimg.com/vi/${id}/hqdefault.jpg` }; }
+function onThumbError(imgEl,id){ if(imgEl.dataset.fallback!=="1"){ imgEl.dataset.fallback="1"; imgEl.src=getYoutubeThumb(id).hq; return;} imgEl.src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Crect width='100%25' height='100%25' fill='%23101010'/%3E%3Ctext x='50%25' y='50%25' fill='%23ffffff66' font-size='16' font-family='Arial' text-anchor='middle' dominant-baseline='middle'%3EThumbnail unavailable%3C/text%3E%3C/svg%3E"; }
 
-      const player = new YT.Player(iframeEl.id, {
-        events: {
-          onReady: (e) => {
-            const wrap = iframeEl.closest(".video-item");
-            if (wrap) {
-              const skel = wrap.querySelector('.skeleton');
-              if (skel) skel.remove();
-            }
-            if (onReadyCb) onReadyCb(e);
-          },
-          onStateChange: (e) => {
-            if (e.data === YT.PlayerState.PLAYING) pauseAllVideos(e.target);
-          }
-        }
-      });
+const ADMIN_PASSWORD="Qy,enPort2015";
+function login(){ if(document.getElementById("pw").value!==ADMIN_PASSWORD){ alert("Mot de passe incorrect !"); return; } localStorage.setItem("admin_ok","true"); showDash(); }
+function logout(){ localStorage.removeItem("admin_ok"); location.reload(); }
+function showDash(){ document.getElementById("loginBox").classList.add("hidden"); document.getElementById("dash").classList.remove("hidden"); syncOptionsForAdd(); refreshVideos(); initRealtime(); }
+if(localStorage.getItem("admin_ok")==="true"){ showDash(); }
+function initRealtime(){ supabaseClient.channel("videos-live-admin").on("postgres_changes",{event:"*",schema:"public",table:"videos"},()=>refreshVideos()).subscribe(); }
 
-      players.push(player);
-      return player;
-    }
-
-    function onYouTubeIframeAPIReady() {
-      initRealtime();
-      refreshFromSupabase();
-      initVisibilityChangePause();
-      window.addEventListener("resize", setupShortsScrollLimit);
-    }
-
-    /* ============================================================
-      5) REALTIME SYNC (MAGIC PART)
-    ============================================================ */
-    function initRealtime(){
-      supabaseClient
-        .channel("videos-live")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "videos" },
-          () => {
-            refreshFromSupabase();
-          }
-        )
-        .subscribe();
-    }
-
-    /* ============================================================
-      6) LOAD FROM SUPABASE
-    ============================================================ */
-   async function refreshFromSupabase() {
-  document.getElementById("live-status").textContent = "Loading videos...";
-
-  const { data, error } = await supabaseClient
-    .from("videos")
-    .select("*")
-    .order("created_at", { ascending: false }); // on trie par date ici, on va gérer position après
-
-  if (error) {
-    console.error(error);
-    document.getElementById("live-status").textContent = "Supabase error: " + error.message;
-    return;
-  }
-
-  videos = data || [];
-
-  // Grouper par catégorie et trier chaque groupe par position
-  const grouped = {};
-  videos.forEach(v => {
-    if (!grouped[v.category]) grouped[v.category] = [];
-    grouped[v.category].push(v);
-  });
-
-  for (const cat in grouped) {
-    grouped[cat].sort((a, b) => a.position - b.position);
-  }
-
-  // Reconstruire le tableau "videos" dans l'ordre correct par catégorie
-  videos = [];
-  Object.keys(CATEGORY_OPTIONS).forEach(cat => {
-    if (grouped[cat]) videos.push(...grouped[cat]);
-  });
-
-  renderEverything();
-  document.getElementById("live-status").textContent =
-    `Live synced • ${videos.length} video(s)`;
+let videos=[];
+async function refreshVideos(){
+  document.getElementById("status").textContent="Loading...";
+  const { data,error } = await supabaseClient.from("videos").select("*").order("position",{ascending:true});
+  if(error){ console.error(error); document.getElementById("status").textContent="Supabase error: "+error.message; return; }
+  videos=data||[];
+  document.getElementById("count").textContent=`${videos.length} video(s)`;
+  document.getElementById("status").textContent="Synced ✔";
+  normalizePositionsPerGroup().then(renderAdminList);
 }
 
-
-    /* ============================================================
-      7) RENDER
-    ============================================================ */
-    function renderEverything(){
-      players = [];
-      renderPortfolio();
-      updateSubTabDisplay();
-      setTimeout(() => setupShortsScrollLimit(), 100);
+/* ===============================
+   POSITION PAR GROUPE
+=============================== */
+async function normalizePositionsPerGroup(){
+  const groups={};
+  videos.forEach(v=>{
+    const key=`${v.category}|${v.option}`;
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(v);
+  });
+  for(const key in groups){
+    groups[key].sort((a,b)=>(a.position??0)-(b.position??0));
+    for(let i=0;i<groups[key].length;i++){
+      const v=groups[key][i];
+      const wanted=i+1;
+      if(v.position!==wanted){
+        await supabaseClient.from("videos").update({position:wanted}).eq("id",v.id);
+        v.position=wanted;
+      }
     }
+  }
+}
 
-    function getThumb(videoId){
-      return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-    }
+/* ===============================
+   RENDER ADMIN LIST GROUPED
+=============================== */
+function renderAdminList(){
+  const wrap=document.getElementById("admin-list");
+  wrap.innerHTML="";
+  const grouped={};
+  videos.forEach(v=>{
+    const key=`${v.category}|${v.option}`;
+    if(!grouped[key]) grouped[key]=[];
+    grouped[key].push(v);
+  });
 
-    function getBadgeText(v){
-      const opt = CATEGORY_OPTIONS[v.category]?.find(o => o.value === v.option);
-      return opt?.badge || "Video";
-    }
+  Object.keys(grouped).sort().forEach(key=>{
+    const [category,option]=key.split("|");
+    const groupVids=grouped[key].sort((a,b)=>(a.position??0)-(b.position??0));
 
-    function renderPortfolio(){
-      const shortsGrid = document.getElementById("shorts-content");
-      const longGrid = document.getElementById("long-content");
-      shortsGrid.innerHTML = "";
-      longGrid.innerHTML = "";
+    const header=document.createElement("h3");
+    header.className="text-lg font-bold text-purple-400 mt-4 mb-2";
+    header.textContent=`${category.toUpperCase()} – ${getBadgeText(category,option)}`;
+    wrap.appendChild(header);
 
-      const shorts = videos.filter(v => v.category === "shorts");
-      const longs = videos.filter(v => v.category === "long");
+    groupVids.forEach((v,index)=>{
+      const card=document.createElement("div");
+      card.className="admin-item";
+      const thumbs=getYoutubeThumb(v.youtube_id);
+      const disabledUp=index===0;
+      const disabledDown=index===groupVids.length-1;
 
-      shorts.forEach(v => shortsGrid.appendChild(buildCard(v)));
-      longs.forEach(v => longGrid.appendChild(buildCard(v)));
-
-      initThumbSkeletonFix();
-      initClickToPlay();
-    }
-
-    function buildCard(v){
-      const div = document.createElement("div");
-
-      const isShort = v.category === "shorts";
-      const badge = getBadgeText(v);
-      const aspect = isShort ? "aspect-[9/16]" : "aspect-video";
-
-      div.className = `video-item ${aspect} ${v.option}`;
-      div.setAttribute("data-video-id", v.youtube_id);
-      div.setAttribute("data-sub", v.option);
-
-      div.innerHTML = `
-        <div class="skeleton"></div>
-        <div class="${isShort ? "badge-short" : "badge-long"}">${badge}</div>
-        <div class="yt-thumb" style="background-image:url('${getThumb(v.youtube_id)}')"></div>
-        <div class="play-btn">
-          <span>
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </span>
+      card.innerHTML=`
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <div class="thumb"><img src="${thumbs.max}" alt="Thumbnail" loading="lazy" onerror="onThumbError(this,'${escapeAttr(v.youtube_id)}')" /></div>
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="admin-pill">${v.category.toUpperCase()}</span>
+              <span class="admin-pill">${getBadgeText(v.category,v.option)}</span>
+              <span class="admin-pill">pos: ${v.position??0}</span>
+              <span class="admin-pill">ID: ${escapeHtml(v.youtube_id)}</span>
+            </div>
+            <div class="text-white font-extrabold text-lg leading-tight">${escapeHtml(v.title||"Untitled")}</div>
+            <a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.youtube_id)}" target="_blank" class="text-sm text-purple-300 hover:text-purple-200 font-bold">Preview on YouTube →</a>
+          </div>
         </div>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <button class="btn-pro btn-neutral" onclick="moveUp(${v.id})" ${disabledUp?"disabled":""}>↑</button>
+          <button class="btn-pro btn-neutral" onclick="moveDown(${v.id})" ${disabledDown?"disabled":""}>↓</button>
+          <button class="btn-pro btn-neutral" onclick="toggleEdit(${v.id})">Modifier</button>
+          <button class="btn-pro btn-danger" onclick="deleteVideo(${v.id})">Supprimer</button>
+        </div>
+      </div>
+      <div id="edit-${v.id}" class="inline-edit hidden">
+        <div class="grid md:grid-cols-4 gap-3">
+          <div><label class="admin-label">Title</label><input id="edit-title-${v.id}" class="admin-input" value="${escapeAttr(v.title)}" /></div>
+          <div><label class="admin-label">YouTube ID</label><input id="edit-youtube-${v.id}" class="admin-input" value="${escapeAttr(v.youtube_id)}" /></div>
+          <div><label class="admin-label">Category</label>
+            <select id="edit-category-${v.id}" class="admin-select" onchange="syncOptionsForEdit(${v.id})">
+              <option value="shorts" ${v.category==="shorts"?"selected":""}>Short Form</option>
+              <option value="long" ${v.category==="long"?"selected":""}>Long Form</option>
+            </select>
+          </div>
+          <div><label class="admin-label">Option</label><select id="edit-option-${v.id}" class="admin-select"></select></div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button class="btn-pro btn-primary w-full sm:w-auto" onclick="saveEdit(${v.id})">Save</button>
+          <button class="btn-pro btn-neutral w-full sm:w-auto" onclick="toggleEdit(${v.id})">Cancel</button>
+        </div>
+      </div>
       `;
+      wrap.appendChild(card);
+      syncOptionsForEdit(v.id);
+    });
+  });
+}
 
-      return div;
-    }
+/* ===============================
+   ADD / EDIT / DELETE / ORDER / ESCAPERS
+   (Similaire code précédent)
+=============================== */
+function syncOptionsForAdd(){ const cat=document.getElementById("add-category").value; const optSelect=document.getElementById("add-option"); optSelect.innerHTML=""; CATEGORY_OPTIONS[cat].forEach(o=>{ const op=document.createElement("option"); op.value=o.value; op.textContent=o.label; optSelect.appendChild(op); }); }
+function syncOptionsForEdit(id){ const catSelect=document.getElementById(`edit-category-${id}`); const optSelect=document.getElementById(`edit-option-${id}`); if(!catSelect||!optSelect)return; const cat=catSelect.value; const current=videos.find(v=>v.id===id); optSelect.innerHTML=""; CATEGORY_OPTIONS[cat].forEach(o=>{ const op=document.createElement("option"); op.value=o.value; op.textContent=o.label; optSelect.appendChild(op); }); optSelect.value=CATEGORY_OPTIONS[cat].some(o=>o.value===current.option)?current.option:CATEGORY_OPTIONS[cat][0].value; }
 
-    /* ============================================================
-      8) PLAY BEHAVIOR
-    ============================================================ */
-    function initThumbSkeletonFix() {
-      document.querySelectorAll(".video-item").forEach(card => {
-        const thumb = card.querySelector(".yt-thumb");
-        if (!thumb) return;
+async function addVideo(){ const title=document.getElementById("add-title").value.trim(); const youtube_id=document.getElementById("add-youtube").value.trim(); const category=document.getElementById("add-category").value; const option=document.getElementById("add-option").value; if(!youtube_id){ alert("YouTube ID required."); return; } if(!/^[a-zA-Z0-9_-]{6,20}$/.test(youtube_id)){ alert("Invalid YouTube ID."); return; } const sameGroup=videos.filter(v=>v.category===category && v.option===option); const nextPos=sameGroup.length+1; const { error }=await supabaseClient.from("videos").insert([{youtube_id,title:title||null,category,option,position:nextPos}]); if(error){ alert("Supabase error: "+error.message); console.error(error); return; } document.getElementById("add-title").value=""; document.getElementById("add-youtube").value=""; refreshVideos(); }
 
-        const bg = thumb.style.backgroundImage;
-        const url = bg.replace(/url\(['"]?/, '').replace(/['"]?\)/, '');
+async function deleteVideo(id){ if(!confirm("Supprimer cette vidéo ?")) return; const { error }=await supabaseClient.from("videos").delete().eq("id",id); if(error){ alert("Supabase error: "+error.message); console.error(error); return; } normalizePositionsPerGroup().then(refreshVideos); }
+function toggleEdit(id){ const el=document.getElementById(`edit-${id}`); if(!el)return; el.classList.toggle("hidden"); syncOptionsForEdit(id); }
+async function saveEdit(id){ const title=document.getElementById(`edit-title-${id}`).value.trim(); const youtube_id=document.getElementById(`edit-youtube-${id}`).value.trim(); const category=document.getElementById(`edit-category-${id}`).value; const option=document.getElementById(`edit-option-${id}`).value; if(!youtube_id){ alert("YouTube ID required."); return; } if(!/^[a-zA-Z0-9_-]{6,20}$/.test(youtube_id)){ alert("Invalid YouTube ID."); return; } const { error }=await supabaseClient.from("videos").update({title:title||null,youtube_id,category,option}).eq("id",id); if(error){ alert("Supabase error: "+error.message); console.error(error); return; } toggleEdit(id); refreshVideos(); }
 
-        const img = new Image();
-        img.onload = () => {
-          const skel = card.querySelector(".skeleton");
-          if (skel) skel.remove();
-        };
-        img.onerror = () => {
-          setTimeout(() => {
-            const skel = card.querySelector(".skeleton");
-            if (skel) skel.remove();
-          }, 1200);
-        };
-        img.src = url;
-      });
-    }
+async function moveUp(id){ const v=videos.find(v=>v.id===id); if(!v)return; const sameGroup=videos.filter(x=>x.category===v.category && x.option===v.option).sort((a,b)=>(a.position??0)-(b.position??0)); const index=sameGroup.findIndex(x=>x.id===id); if(index<=0)return; const neighbor=sameGroup[index-1]; await swapPositions(v,neighbor); refreshVideos(); }
+async function moveDown(id){ const v=videos.find(v=>v.id===id); if(!v)return; const sameGroup=videos.filter(x=>x.category===v.category && x.option===v.option).sort((a,b)=>(a.position??0)-(b.position??0)); const index=sameGroup.findIndex(x=>x.id===id); if(index===-1||index>=sameGroup.length-1)return; const neighbor=sameGroup[index+1]; await swapPositions(v,neighbor); refreshVideos(); }
+async function swapPositions(a,b){ const posA=a.position??0; const posB=b.position??0; const { error:e1}=await supabaseClient.from("videos").update({position:posB}).eq("id",a.id); const { error:e2}=await supabaseClient.from("videos").update({position:posA}).eq("id",b.id); if(e1||e2){ console.error(e1||e2); alert("Error swapping positions."); } }
 
-    function initClickToPlay(){
-      document.querySelectorAll(".video-item").forEach((card) => {
-        const videoId = card.getAttribute("data-video-id");
-        const isShort = card.classList.contains("aspect-[9/16]");
-
-        function start(){
-          pauseAllVideos();
-
-          if(isShort){
-            card.innerHTML = `
-              <div class="skeleton"></div>
-              <iframe
-                class="js-short"
-                src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&playsinline=1&rel=0&autoplay=1&mute=0&vq=hd1080"
-                allow="autoplay; encrypted-media"
-                allowfullscreen
-              ></iframe>
-            `;
-
-            const iframe = card.querySelector("iframe");
-            const player = buildYTPlayer(iframe, () => {
-              try { player.setPlaybackQuality("hd1080"); } catch(e){}
-            });
-
-            setTimeout(() => { try { player.playVideo(); } catch(e){} }, 150);
-
-          }else{
-            card.innerHTML = `
-              <div class="skeleton"></div>
-              <button class="mute-btn" data-muted="1" onclick="toggleMute(event)">
-                <svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5z"/></svg>
-                <span>Muted</span>
-              </button>
-              <iframe
-                class="js-long"
-                src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&playsinline=1&rel=0&autoplay=1&mute=1&vq=hd1080"
-                allow="autoplay; encrypted-media"
-                allowfullscreen
-              ></iframe>
-            `;
-
-            const iframe = card.querySelector("iframe");
-            const player = buildYTPlayer(iframe, () => {
-              try { player.setPlaybackQuality("hd1080"); } catch(e){}
-            });
-
-            setTimeout(() => { try { player.playVideo(); } catch(e){} }, 150);
-          }
-        }
-
-        card.addEventListener("click", () => {
-          if (card.querySelector("iframe")) return;
-          start();
-        });
-
-        card.setAttribute("tabindex", "0");
-        card.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            if (card.querySelector("iframe")) return;
-            start();
-          }
-        });
-      });
-    }
-
-    function toggleMute(event){
-      event.preventDefault();
-      event.stopPropagation();
-
-      const btn = event.currentTarget;
-      const wrap = btn.closest(".video-item");
-      const iframe = wrap.querySelector("iframe");
-
-      const player = players.find(p => {
-        try { return p.getIframe() === iframe; } catch(e){ return false; }
-      });
-
-      if(!player) return;
-
-      const muted = btn.getAttribute("data-muted") === "1";
-
-      if(muted){
-        try { player.unMute(); } catch(e){}
-        btn.setAttribute("data-muted","0");
-        btn.querySelector("span").textContent = "Sound";
-      }else{
-        try { player.mute(); } catch(e){}
-        btn.setAttribute("data-muted","1");
-        btn.querySelector("span").textContent = "Muted";
-      }
-    }
-
-    function initVisibilityChangePause() {
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) pauseAllVideos();
-      });
-      window.addEventListener("blur", () => pauseAllVideos());
-    }
-
-    /* ============================================================
-      9) TABS + SUBTABS
-    ============================================================ */
-    function switchTab(type) {
-      pauseAllVideos();
-
-      const shorts = document.getElementById('shorts-wrapper');
-      const long = document.getElementById('long-content');
-      const tabS = document.getElementById('tab-shorts');
-      const tabL = document.getElementById('tab-long');
-
-      if (type === 'shorts') {
-        shorts.classList.remove('hidden');
-        long.classList.add('hidden');
-        tabS.classList.add('active');
-        tabL.classList.remove('active');
-        currentTab = 'shorts';
-        currentSubTab = 'short-talking';
-      } else {
-        long.classList.remove('hidden');
-        shorts.classList.add('hidden');
-        tabL.classList.add('active');
-        tabS.classList.remove('active');
-        currentTab = 'long';
-        currentSubTab = 'long-talking';
-      }
-
-      updateSubTabDisplay();
-      setTimeout(() => setupShortsScrollLimit(), 120);
-    }
-
-    function updateSubTabDisplay() {
-      const btnShortTalking = document.getElementById('subtab-short-talking');
-      const btnShortRealEstate = document.getElementById('subtab-short-realestate');
-      const btnLongTalking = document.getElementById('subtab-long-talking');
-      const btnLongDoc = document.getElementById('subtab-long-documentary');
-
-      if (currentTab === 'shorts') {
-        btnShortTalking.classList.remove('hidden');
-        btnShortRealEstate.classList.remove('hidden');
-        btnLongTalking.classList.add('hidden');
-        btnLongDoc.classList.add('hidden');
-
-        btnShortTalking.classList.toggle('active', currentSubTab === 'short-talking');
-        btnShortRealEstate.classList.toggle('active', currentSubTab === 'short-realestate');
-
-        document.querySelectorAll('#shorts-content .video-item').forEach(el => {
-          el.classList.toggle('hidden', !el.classList.contains(currentSubTab));
-        });
-
-      } else {
-        btnShortTalking.classList.add('hidden');
-        btnShortRealEstate.classList.add('hidden');
-        btnLongTalking.classList.remove('hidden');
-        btnLongDoc.classList.remove('hidden');
-
-        btnLongTalking.classList.toggle('active', currentSubTab === 'long-talking');
-        btnLongDoc.classList.toggle('active', currentSubTab === 'long-documentary');
-
-        document.querySelectorAll('#long-content .video-item').forEach(el => {
-          el.classList.toggle('hidden', el.getAttribute("data-sub") !== currentSubTab);
-        });
-      }
-
-      setTimeout(() => setupShortsScrollLimit(), 80);
-    }
-
-    function switchSubTab(sub) {
-      currentSubTab = sub;
-      updateSubTabDisplay();
-    }
-
-    function scrollToWork() {
-      document.getElementById('work').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function setupShortsScrollLimit(){
-      const wrapper = document.querySelector(".shorts-grid-wrapper");
-      const grid = document.querySelector(".shorts-grid");
-      if(!wrapper || !grid) return;
-
-      const visibleItems = Array.from(grid.children).filter(el => !el.classList.contains("hidden"));
-      if(visibleItems.length <= 8){
-        wrapper.style.maxHeight = "none";
-        wrapper.style.overflowY = "visible";
-        return;
-      }
-
-      const first = visibleItems[0];
-      const rect = first.getBoundingClientRect();
-      const itemHeight = rect.height;
-
-      const computed = window.getComputedStyle(grid);
-      const gap = parseFloat(computed.gap || "16");
-
-      const maxH = (itemHeight * 2) + gap;
-      wrapper.style.maxHeight = maxH + "px";
-      wrapper.style.overflowY = "auto";
-    }
-  </script>
+function escapeHtml(str){ return String(str||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+function escapeAttr(str){ return String(str||"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+</script>
 </body>
 </html>
