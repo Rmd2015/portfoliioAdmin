@@ -1,267 +1,1120 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Admin Dashboard | Portfolio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portfolio | Aymen</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
-<style>
-:root{ --accent:#8b5cf6; }
-body{ font-family:'Plus Jakarta Sans',sans-serif; background: radial-gradient(circle at 20% 10%, rgba(139,92,246,0.18) 0%, transparent 45%), radial-gradient(circle at 80% 80%, rgba(168,85,247,0.12) 0%, transparent 55%), linear-gradient(135deg,#0f001a 0%,#050014 50%,#0a001f 100%); min-height:100vh; color:#fff; }
-.admin-wrap{ background: rgba(10,10,10,0.65); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(14px); border-radius: 24px; padding: 18px; }
-.admin-input,.admin-select{ width:100%; background:#070707; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:12px 14px; color:#fff; outline:none; transition:all .2s ease; font-weight:700; font-size:14px; }
-.admin-input:focus,.admin-select:focus{ border-color: rgba(139,92,246,0.65); box-shadow: 0 0 0 3px rgba(139,92,246,0.16); }
-.admin-label{ font-size: 11px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 8px; display:block; }
-.btn-pro{ border-radius: 16px; padding: 12px 16px; font-size: 13px; font-weight: 900; letter-spacing: .02em; transition: all .2s ease; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: white; display:inline-flex; align-items:center; justify-content:center; gap:8px; user-select:none; }
-.btn-pro:hover{ transform: translateY(-1px); border-color: rgba(139,92,246,0.55); background: rgba(139,92,246,0.12); }
-.btn-pro:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
-.btn-primary{ background: var(--accent); border-color: rgba(139,92,246,0.7); box-shadow:0 18px 40px rgba(139,92,246,0.14); }
-.btn-primary:hover{ background:#7c3aed;border-color:#7c3aed; }
-.btn-danger{ background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); }
-.btn-danger:hover{ background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.5); }
-.btn-neutral{ background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.10); }
-.btn-neutral:hover{ background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
-.admin-item{ border:1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.35); border-radius: 20px; padding: 14px; }
-.admin-pill{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background: rgba(139,92,246,0.10); border:1px solid rgba(139,92,246,0.18); color:#ddd; font-size:12px; font-weight:900; }
-.inline-edit{ margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; display:grid; gap: 10px; }
-.thumb{ width: 160px; height: 90px; border-radius: 16px; overflow:hidden; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); flex: 0 0 auto; position: relative; }
-.thumb img{ width:100%; height:100%; object-fit: cover; display:block; transform: scale(1.01); }
-.thumb::after{ content:""; position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.55), transparent 60%); pointer-events:none; }
-.hidden{display:none!important;}
-</style>
+  <style>
+    :root { --accent:#8b5cf6; }
+
+    body{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background: radial-gradient(ellipse at 10% 20%, rgba(139,92,246,0.18) 0%, transparent 40%),
+        radial-gradient(ellipse at 80% 70%, rgba(168,85,247,0.14) 0%, transparent 50%),
+        linear-gradient(135deg,#0f001a 0%,#050014 50%,#0a001f 100%);
+      background-attachment:fixed;
+      min-height:100vh;
+      color:#fff;
+    }
+
+    .card{
+      background: rgba(15,15,15,0.9);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:22px;
+      box-shadow: 0 18px 70px rgba(0,0,0,0.35);
+    }
+
+    .btn{
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .02em;
+      transition: all .2s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:#101010;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(139,92,246,0.6); }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+    .btn-primary{ background: var(--accent); border-color: rgba(139,92,246,0.9); }
+    .btn-primary:hover{ background:#7c3aed; }
+    .btn-danger{ background:#140505; border-color: rgba(239,68,68,0.35); }
+    .btn-danger:hover{ border-color: rgba(239,68,68,0.7); }
+    .btn-ghost{ background: transparent; }
+
+    .input, select{
+      background:#0c0c0c;
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:16px;
+      padding: 12px 14px;
+      outline:none;
+      width:100%;
+      font-weight:700;
+      color:#fff;
+    }
+    .input:focus, select:focus{
+      border-color: rgba(139,92,246,0.8);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+    }
+
+    .tag{
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      padding: 6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color:#c4b5fd;
+    }
+
+    .row{
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:18px;
+      padding: 14px;
+      background: rgba(10,10,10,0.6);
+    }
+
+    .muted{ color:#71717a; }
+    .tiny{ font-size:12px; color:#a1a1aa; }
+
+    .divider{
+      height:1px;
+      background: rgba(255,255,255,0.06);
+      width:100%;
+      margin: 14px 0;
+    }
+  </style>
 </head>
 
-<body class="p-6 md:p-10">
-<div class="max-w-6xl mx-auto space-y-6">
+<body class="px-6 md:px-16 py-12">
 
-<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-  <div>
-    <div class="text-purple-400 text-[10px] font-extrabold tracking-[0.35em] uppercase">Admin Dashboard</div>
-    <h1 class="text-3xl md:text-4xl font-extrabold mt-2">Manage Portfolio Videos</h1>
-    <p class="text-zinc-400 mt-2">Toutes les actions sont synchronisées en temps réel avec <b>Portfolio</b>.</p>
-  </div>
-  <div class="flex gap-3">
-    <a href="index.html" class="btn-pro btn-neutral">Open Portfolio</a>
-    <button onclick="logout()" class="btn-pro btn-neutral">Logout</button>
-  </div>
-</div>
+  <!-- LOGIN SCREEN -->
+  <div id="auth-screen" class="max-w-md mx-auto hidden">
+    <div class="card p-7 md:p-9">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg border border-purple-500/20 bg-purple-500/5 text-purple-400 text-[10px] font-extrabold tracking-[0.25em] uppercase">
+        Auth
+      </div>
 
-<div id="loginBox" class="admin-wrap max-w-md">
-  <h2 class="text-xl font-extrabold">Admin Login</h2>
-  <p class="text-zinc-400 text-sm mt-1">Accès réservé</p>
-  <div class="mt-4 space-y-3">
-    <input id="pw" type="password" class="admin-input" placeholder="Mot de passe" />
-    <button class="btn-pro btn-primary w-full" onclick="login()">Se connecter</button>
-  </div>
-</div>
+      <h1 class="text-2xl font-extrabold mt-4">Connexion Admin</h1>
+      <p class="text-zinc-400 mt-2 text-sm">
+        Connexion sécurisée via Supabase Auth (email + mot de passe).
+      </p>
 
-<div id="dash" class="hidden space-y-6">
+      <div class="divider"></div>
 
-<div class="admin-wrap">
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div>
-      <h2 class="text-xl font-extrabold">Add Video</h2>
-      <p class="text-zinc-400 text-sm mt-1">YouTube ID + category + option + title.</p>
-    </div>
-    <p id="status" class="text-xs text-zinc-400"></p>
-  </div>
+      <div class="space-y-3">
+        <input id="login-email" class="input" type="email" placeholder="Email admin" autocomplete="email" />
+        <input id="login-password" class="input" type="password" placeholder="Mot de passe" autocomplete="current-password" />
+        <button class="btn btn-primary w-full" onclick="login()">🔐 Se connecter</button>
+      </div>
 
-  <div class="grid md:grid-cols-4 gap-4 mt-6">
-    <div>
-      <label class="admin-label">Title</label>
-      <input id="add-title" class="admin-input" placeholder="Example: Real Estate Hook Edit" />
-    </div>
-    <div>
-      <label class="admin-label">YouTube Video ID</label>
-      <input id="add-youtube" class="admin-input" placeholder="Example: z6JMaEGuCjY" />
-    </div>
-    <div>
-      <label class="admin-label">Category</label>
-      <select id="add-category" class="admin-select" onchange="syncOptionsForAdd()">
-        <option value="shorts">Short Form</option>
-        <option value="long">Long Form</option>
-      </select>
-    </div>
-    <div>
-      <label class="admin-label">Option</label>
-      <select id="add-option" class="admin-select"></select>
+      <p id="auth-status" class="text-xs text-zinc-400 mt-4"></p>
     </div>
   </div>
 
-  <div class="flex flex-col sm:flex-row gap-3 mt-4">
-    <button class="btn-pro btn-primary w-full sm:w-auto" onclick="addVideo()">+ Add Video</button>
-    <button class="btn-pro btn-neutral w-full sm:w-auto" onclick="refreshVideos()">Refresh</button>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="max-w-6xl mx-auto space-y-8 hidden">
+
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg border border-purple-500/20 bg-purple-500/5 text-purple-400 text-[10px] font-extrabold tracking-[0.25em] uppercase">
+          Admin Dashboard
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold mt-3">Portfolio Manager</h1>
+        <p class="text-zinc-400 mt-2 max-w-xl text-sm">
+          Gestion complète : catégories, sous-catégories, vidéos, positions (par groupe), et sync live.
+        </p>
+
+        <div class="mt-3 text-xs text-zinc-500">
+          Connecté : <span id="user-email" class="text-zinc-200 font-bold"></span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button class="btn btn-ghost" onclick="refreshAll()">🔄 Refresh</button>
+        <button class="btn" onclick="fixAllPositions()">🧠 Fix all positions</button>
+        <a class="btn btn-primary" href="index.html" target="_blank">🚀 Ouvrir Portfolio</a>
+        <button class="btn btn-danger" onclick="logout()">🚪 Déconnexion</button>
+      </div>
+    </header>
+
+    <div id="status" class="text-xs text-zinc-400"></div>
+
+    <!-- CATEGORIES -->
+    <section class="card p-6 md:p-8">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h2 class="text-xl font-extrabold">📌 Catégories</h2>
+          <p class="text-zinc-400 text-sm mt-1">Tabs principaux du portfolio (Shorts, Long, Podcast...).</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-3 mt-6">
+        <input id="cat-key" class="input" placeholder="key (ex: shorts)" />
+        <input id="cat-label" class="input" placeholder="label (ex: Short Form)" />
+        <input id="cat-sort" class="input" placeholder="sort (ex: 1)" />
+        <button class="btn btn-primary" onclick="addCategory()">➕ Ajouter</button>
+      </div>
+
+      <div id="categories-list" class="mt-6 space-y-3"></div>
+    </section>
+
+    <!-- SUBCATEGORIES -->
+    <section class="card p-6 md:p-8">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h2 class="text-xl font-extrabold">🧩 Sous-catégories</h2>
+          <p class="text-zinc-400 text-sm mt-1">Sous-tabs dynamiques (Talking, Real estate...).</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-6 gap-3 mt-6">
+        <select id="sub-cat"></select>
+        <input id="sub-value" class="input" placeholder="value (ex: short-talking)" />
+        <input id="sub-label" class="input" placeholder="label (ex: Short – Talking)" />
+        <input id="sub-badge" class="input" placeholder="badge (ex: Talking)" />
+        <input id="sub-sort" class="input" placeholder="sort (ex: 1)" />
+        <button class="btn btn-primary" onclick="addSubcategory()">➕ Ajouter</button>
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-2 items-center">
+        <span class="tag">Filtrer</span>
+        <select id="filter-sub-cat" onchange="renderSubcategories()" class="input" style="max-width:260px"></select>
+      </div>
+
+      <div id="subcategories-list" class="mt-6 space-y-3"></div>
+    </section>
+
+    <!-- VIDEOS -->
+    <section class="card p-6 md:p-8">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h2 class="text-xl font-extrabold">🎥 Vidéos</h2>
+          <p class="text-zinc-400 text-sm mt-1">
+            Position = ordre dans la même catégorie + option.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-5 gap-3 mt-6">
+        <input id="v-title" class="input" placeholder="Titre (ex: Client X)" />
+        <input id="v-youtube" class="input" placeholder="YouTube ID (ex: dQw4w9WgXcQ)" />
+        <select id="v-category"></select>
+        <select id="v-option"></select>
+        <button class="btn btn-primary justify-center" onclick="addVideo()">➕ Ajouter</button>
+      </div>
+
+      <div class="mt-6 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="tag">Filtrer</span>
+          <select id="filter-category" onchange="renderVideos()" class="input" style="max-width:260px"></select>
+          <select id="filter-option" onchange="renderVideos()" class="input" style="max-width:340px"></select>
+        </div>
+        <div class="text-xs text-zinc-500" id="video-count"></div>
+      </div>
+
+      <div id="videos-list" class="mt-6 space-y-3"></div>
+    </section>
+
   </div>
-</div>
 
-<div class="admin-wrap">
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div>
-      <h2 class="text-xl font-extrabold">Current Videos</h2>
-      <p class="text-zinc-400 text-sm mt-1">Grouped by Category + Option with position relative to group.</p>
-    </div>
-    <p id="count" class="text-xs text-zinc-400"></p>
-  </div>
+  <script>
+    // ============================================================
+    // 0) CONFIG
+    // ============================================================
+    const SUPABASE_URL = "https://azifnmqcvxpbnehngowk.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_F3Lc4DDgluakOjvBiid7hQ_Y60dgUYT";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <div id="admin-list" class="mt-6 grid gap-4"></div>
-</div>
+    // OPTIONNEL (fortement recommandé) :
+    // Mets ton email admin ici, sinon laisse null.
+    const ONLY_ALLOW_EMAIL = null; // ex: "admin@tonsite.com"
 
-</div>
-</div>
+    // ============================================================
+    // 1) STATE
+    // ============================================================
+    let categories = [];
+    let subcategories = [];
+    let videos = [];
 
-<script>
-const SUPABASE_URL="https://ajubgliywevrwafnhdyv.supabase.co";
-const SUPABASE_KEY="sb_publishable_iuCPHxztz0y9pgbQT5m1UQ_asgQAb7f";
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    let editingCategoryId = null;
+    let editingSubcategoryId = null;
+    let editingVideoId = null;
 
-const CATEGORY_OPTIONS={
-  shorts:[{value:"short-talking",label:"Short – Talking Head",badge:"Talking Head"},{value:"short-realestate",label:"Short – Real Estate",badge:"Real Estate"}],
-  long:[{value:"long-talking",label:"Long – Talking Head",badge:"Talking Head"},{value:"long-documentary",label:"Long – Documentary",badge:"Documentary"}]
-};
+    const $ = (id) => document.getElementById(id);
 
-function getBadgeText(category,option){ const opt=CATEGORY_OPTIONS[category]?.find(o=>o.value===option); return opt?.badge||"Video"; }
-function getYoutubeThumb(id){ return { max:`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`, hq:`https://i.ytimg.com/vi/${id}/hqdefault.jpg` }; }
-function onThumbError(imgEl,id){ if(imgEl.dataset.fallback!=="1"){ imgEl.dataset.fallback="1"; imgEl.src=getYoutubeThumb(id).hq; return;} imgEl.src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Crect width='100%25' height='100%25' fill='%23101010'/%3E%3Ctext x='50%25' y='50%25' fill='%23ffffff66' font-size='16' font-family='Arial' text-anchor='middle' dominant-baseline='middle'%3EThumbnail unavailable%3C/text%3E%3C/svg%3E"; }
+    function setStatus(msg){ $("status").textContent = msg; }
+    function setAuthStatus(msg){ $("auth-status").textContent = msg; }
 
-const ADMIN_PASSWORD="Qy,enPort2015";
-function login(){ if(document.getElementById("pw").value!==ADMIN_PASSWORD){ alert("Mot de passe incorrect !"); return; } localStorage.setItem("admin_ok","true"); showDash(); }
-function logout(){ localStorage.removeItem("admin_ok"); location.reload(); }
-function showDash(){ document.getElementById("loginBox").classList.add("hidden"); document.getElementById("dash").classList.remove("hidden"); syncOptionsForAdd(); refreshVideos(); initRealtime(); }
-if(localStorage.getItem("admin_ok")==="true"){ showDash(); }
-function initRealtime(){ supabaseClient.channel("videos-live-admin").on("postgres_changes",{event:"*",schema:"public",table:"videos"},()=>refreshVideos()).subscribe(); }
+    function safeInt(v, def=1){
+      const n = parseInt(v, 10);
+      return Number.isFinite(n) ? n : def;
+    }
 
-let videos=[];
-async function refreshVideos(){
-  document.getElementById("status").textContent="Loading...";
-  const { data,error } = await supabaseClient.from("videos").select("*").order("position",{ascending:true});
-  if(error){ console.error(error); document.getElementById("status").textContent="Supabase error: "+error.message; return; }
-  videos=data||[];
-  document.getElementById("count").textContent=`${videos.length} video(s)`;
-  document.getElementById("status").textContent="Synced ✔";
-  normalizePositionsPerGroup().then(renderAdminList);
-}
+    function getThumb(youtubeId){
+      return `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+    }
 
-/* ===============================
-   POSITION PAR GROUPE
-=============================== */
-async function normalizePositionsPerGroup(){
-  const groups={};
-  videos.forEach(v=>{
-    const key=`${v.category}|${v.option}`;
-    if(!groups[key]) groups[key]=[];
-    groups[key].push(v);
-  });
-  for(const key in groups){
-    groups[key].sort((a,b)=>(a.position??0)-(b.position??0));
-    for(let i=0;i<groups[key].length;i++){
-      const v=groups[key][i];
-      const wanted=i+1;
-      if(v.position!==wanted){
-        await supabaseClient.from("videos").update({position:wanted}).eq("id",v.id);
-        v.position=wanted;
+    function getGroupKey(v){
+      return `${v.category}__${v.option}`;
+    }
+
+    // ============================================================
+    // 2) AUTH UI HELPERS
+    // ============================================================
+    function showAuth(){
+      $("auth-screen").classList.remove("hidden");
+      $("dashboard").classList.add("hidden");
+    }
+
+    function showDashboard(){
+      $("auth-screen").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+    }
+
+    // ============================================================
+    // 3) AUTH (SUPABASE)
+    // ============================================================
+    async function login(){
+      const email = ($("login-email").value || "").trim();
+      const password = ($("login-password").value || "").trim();
+
+      if(!email || !password){
+        setAuthStatus("❌ Email + mot de passe obligatoires.");
+        return;
+      }
+
+      setAuthStatus("Connexion en cours...");
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+      if(error){
+        setAuthStatus("❌ " + error.message);
+        return;
+      }
+
+      // check allow email
+      if(ONLY_ALLOW_EMAIL && data?.user?.email !== ONLY_ALLOW_EMAIL){
+        await sb.auth.signOut();
+        setAuthStatus("❌ Accès refusé pour cet email.");
+        return;
+      }
+
+      setAuthStatus("✅ Connecté !");
+      await onLoggedIn();
+    }
+
+    async function logout(){
+      await sb.auth.signOut();
+      showAuth();
+      setAuthStatus("Déconnecté.");
+    }
+
+    async function onLoggedIn(){
+      const { data } = await sb.auth.getUser();
+      const email = data?.user?.email || "-";
+      $("user-email").textContent = email;
+
+      showDashboard();
+      await refreshAll();
+      subscribeRealtime();
+    }
+
+    async function bootAuth(){
+      // check session
+      const { data: sessionData } = await sb.auth.getSession();
+      const session = sessionData?.session;
+
+      if(!session){
+        showAuth();
+        setAuthStatus("Veuillez vous connecter.");
+        return;
+      }
+
+      // check allow email
+      if(ONLY_ALLOW_EMAIL && session.user.email !== ONLY_ALLOW_EMAIL){
+        await sb.auth.signOut();
+        showAuth();
+        setAuthStatus("❌ Email non autorisé.");
+        return;
+      }
+
+      await onLoggedIn();
+    }
+
+    // ============================================================
+    // 4) LOAD ALL
+    // ============================================================
+    async function refreshAll(){
+      setStatus("Loading from Supabase...");
+
+      const [catsRes, subsRes, vidsRes] = await Promise.all([
+        sb.from("categories").select("*").order("sort", { ascending:true }),
+        sb.from("subcategories").select("*").order("category_key", { ascending:true }).order("sort", { ascending:true }),
+        sb.from("videos").select("*")
+          .order("category", { ascending:true })
+          .order("option", { ascending:true })
+          .order("position", { ascending:true })
+          .order("created_at", { ascending:true })
+      ]);
+
+      if(catsRes.error) return setStatus("Error categories: " + catsRes.error.message);
+      if(subsRes.error) return setStatus("Error subcategories: " + subsRes.error.message);
+      if(vidsRes.error) return setStatus("Error videos: " + vidsRes.error.message);
+
+      categories = catsRes.data || [];
+      subcategories = subsRes.data || [];
+      videos = vidsRes.data || [];
+
+      buildSelectors();
+      renderCategories();
+      renderSubcategories();
+      renderVideos();
+
+      setStatus(`Loaded • ${videos.length} videos • ${categories.length} categories • ${subcategories.length} subcategories`);
+    }
+
+    // ============================================================
+    // 5) SELECTORS
+    // ============================================================
+    function buildSelectors(){
+      const catSel = $("v-category");
+      const filterCat = $("filter-category");
+      const subCatSel = $("sub-cat");
+      const filterSubCat = $("filter-sub-cat");
+
+      catSel.innerHTML = "";
+      filterCat.innerHTML = "";
+      subCatSel.innerHTML = "";
+      filterSubCat.innerHTML = "";
+
+      filterCat.innerHTML += `<option value="all">Toutes catégories</option>`;
+      filterSubCat.innerHTML += `<option value="all">Toutes catégories</option>`;
+
+      categories.forEach(c => {
+        catSel.innerHTML += `<option value="${c.key}">${c.label}</option>`;
+        filterCat.innerHTML += `<option value="${c.key}">${c.label}</option>`;
+        subCatSel.innerHTML += `<option value="${c.key}">${c.label}</option>`;
+        filterSubCat.innerHTML += `<option value="${c.key}">${c.label}</option>`;
+      });
+
+      buildOptionSelector();
+      buildFilterOptionSelector();
+    }
+
+    function buildOptionSelector(){
+      const catKey = $("v-category").value;
+      const optionSel = $("v-option");
+      optionSel.innerHTML = "";
+
+      const opts = subcategories.filter(s => s.category_key === catKey);
+      opts.forEach(o => {
+        optionSel.innerHTML += `<option value="${o.value}">${o.label}</option>`;
+      });
+
+      if(opts.length === 0){
+        optionSel.innerHTML = `<option value="">(Aucune option)</option>`;
       }
     }
-  }
-}
 
-/* ===============================
-   RENDER ADMIN LIST GROUPED
-=============================== */
-function renderAdminList(){
-  const wrap=document.getElementById("admin-list");
-  wrap.innerHTML="";
-  const grouped={};
-  videos.forEach(v=>{
-    const key=`${v.category}|${v.option}`;
-    if(!grouped[key]) grouped[key]=[];
-    grouped[key].push(v);
-  });
+    function buildFilterOptionSelector(){
+      const catKey = $("filter-category").value;
+      const optionSel = $("filter-option");
+      optionSel.innerHTML = "";
+      optionSel.innerHTML = `<option value="all">Toutes options</option>`;
 
-  Object.keys(grouped).sort().forEach(key=>{
-    const [category,option]=key.split("|");
-    const groupVids=grouped[key].sort((a,b)=>(a.position??0)-(b.position??0));
+      let opts = subcategories;
+      if(catKey !== "all"){
+        opts = subcategories.filter(s => s.category_key === catKey);
+      }
 
-    const header=document.createElement("h3");
-    header.className="text-lg font-bold text-purple-400 mt-4 mb-2";
-    header.textContent=`${category.toUpperCase()} – ${getBadgeText(category,option)}`;
-    wrap.appendChild(header);
+      opts.forEach(o => {
+        optionSel.innerHTML += `<option value="${o.value}">${o.label}</option>`;
+      });
+    }
 
-    groupVids.forEach((v,index)=>{
-      const card=document.createElement("div");
-      card.className="admin-item";
-      const thumbs=getYoutubeThumb(v.youtube_id);
-      const disabledUp=index===0;
-      const disabledDown=index===groupVids.length-1;
+    $("v-category").addEventListener("change", buildOptionSelector);
+    $("filter-category").addEventListener("change", buildFilterOptionSelector);
 
-      card.innerHTML=`
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div class="thumb"><img src="${thumbs.max}" alt="Thumbnail" loading="lazy" onerror="onThumbError(this,'${escapeAttr(v.youtube_id)}')" /></div>
-          <div class="space-y-2">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="admin-pill">${v.category.toUpperCase()}</span>
-              <span class="admin-pill">${getBadgeText(v.category,v.option)}</span>
-              <span class="admin-pill">pos: ${v.position??0}</span>
-              <span class="admin-pill">ID: ${escapeHtml(v.youtube_id)}</span>
+    // ============================================================
+    // 6) POSITIONS
+    // ============================================================
+    async function normalizeVideoPositionsForGroup(category, option){
+      const { data, error } = await sb
+        .from("videos")
+        .select("id, position, created_at")
+        .eq("category", category)
+        .eq("option", option)
+        .order("position", { ascending:true })
+        .order("created_at", { ascending:true });
+
+      if(error) return console.error(error);
+
+      for(let i=0; i<data.length; i++){
+        const wanted = i + 1;
+        if(data[i].position !== wanted){
+          await sb.from("videos").update({ position: wanted }).eq("id", data[i].id);
+        }
+      }
+    }
+
+    async function normalizeCategorySort(){
+      const { data, error } = await sb
+        .from("categories")
+        .select("id, sort, created_at")
+        .order("sort", { ascending:true })
+        .order("created_at", { ascending:true });
+
+      if(error) return console.error(error);
+
+      for(let i=0; i<data.length; i++){
+        const wanted = i + 1;
+        if(data[i].sort !== wanted){
+          await sb.from("categories").update({ sort: wanted }).eq("id", data[i].id);
+        }
+      }
+    }
+
+    async function normalizeSubcategorySort(categoryKey){
+      const { data, error } = await sb
+        .from("subcategories")
+        .select("id, sort, created_at")
+        .eq("category_key", categoryKey)
+        .order("sort", { ascending:true })
+        .order("created_at", { ascending:true });
+
+      if(error) return console.error(error);
+
+      for(let i=0; i<data.length; i++){
+        const wanted = i + 1;
+        if(data[i].sort !== wanted){
+          await sb.from("subcategories").update({ sort: wanted }).eq("id", data[i].id);
+        }
+      }
+    }
+
+    async function fixAllPositions(){
+      setStatus("Fixing positions...");
+
+      await normalizeCategorySort();
+
+      for(const c of categories){
+        await normalizeSubcategorySort(c.key);
+      }
+
+      const map = new Map();
+      videos.forEach(v => {
+        const key = getGroupKey(v);
+        if(!map.has(key)) map.set(key, []);
+        map.get(key).push(v);
+      });
+
+      for(const [key, group] of map.entries()){
+        await normalizeVideoPositionsForGroup(group[0].category, group[0].option);
+      }
+
+      await refreshAll();
+      setStatus("All positions fixed ✅");
+    }
+
+    // ============================================================
+    // 7) CRUD CATEGORIES
+    // ============================================================
+    async function addCategory(){
+      const key = ($("cat-key").value || "").trim();
+      const label = ($("cat-label").value || "").trim();
+      const sort = safeInt($("cat-sort").value || "0", categories.length + 1);
+
+      if(!key || !label) return alert("key + label obligatoires");
+
+      const { error } = await sb.from("categories").insert([{ key, label, sort }]);
+      if(error) return alert(error.message);
+
+      $("cat-key").value = "";
+      $("cat-label").value = "";
+      $("cat-sort").value = "";
+
+      await refreshAll();
+    }
+
+    async function deleteCategory(id){
+      if(!confirm("Supprimer la catégorie ?")) return;
+
+      const c = categories.find(x => x.id === id);
+      if(!c) return;
+
+      await sb.from("videos").delete().eq("category", c.key);
+      await sb.from("subcategories").delete().eq("category_key", c.key);
+
+      const { error } = await sb.from("categories").delete().eq("id", id);
+      if(error) return alert(error.message);
+
+      await refreshAll();
+    }
+
+    function startEditCategory(id){
+      editingCategoryId = id;
+      renderCategories();
+    }
+
+    function cancelEditCategory(){
+      editingCategoryId = null;
+      renderCategories();
+    }
+
+    async function saveEditCategory(id){
+      const key = ($(`edit-cat-key-${id}`).value || "").trim();
+      const label = ($(`edit-cat-label-${id}`).value || "").trim();
+      const sort = safeInt($(`edit-cat-sort-${id}`).value || "1", 1);
+
+      if(!key || !label) return alert("key + label obligatoires");
+
+      const old = categories.find(x => x.id === id);
+      if(!old) return;
+
+      if(old.key !== key){
+        await sb.from("videos").update({ category: key }).eq("category", old.key);
+        await sb.from("subcategories").update({ category_key: key }).eq("category_key", old.key);
+      }
+
+      const { error } = await sb.from("categories").update({ key, label, sort }).eq("id", id);
+      if(error) return alert(error.message);
+
+      editingCategoryId = null;
+      await refreshAll();
+    }
+
+    async function moveCategory(id, dir){
+      const sorted = [...categories].sort((a,b) => a.sort - b.sort);
+      const idx = sorted.findIndex(x => x.id === id);
+      const swap = dir === "up" ? sorted[idx-1] : sorted[idx+1];
+      if(!swap) return;
+
+      const cur = sorted[idx];
+
+      await sb.from("categories").update({ sort: swap.sort }).eq("id", cur.id);
+      await sb.from("categories").update({ sort: cur.sort }).eq("id", swap.id);
+
+      await normalizeCategorySort();
+      await refreshAll();
+    }
+
+    async function setCategorySort(id){
+      const c = categories.find(x => x.id === id);
+      if(!c) return;
+
+      const wanted = prompt("Nouvelle position (sort):", c.sort);
+      if(wanted === null) return;
+
+      await sb.from("categories").update({ sort: safeInt(wanted, c.sort) }).eq("id", id);
+      await normalizeCategorySort();
+      await refreshAll();
+    }
+
+    // ============================================================
+    // 8) CRUD SUBCATEGORIES
+    // ============================================================
+    async function addSubcategory(){
+      const category_key = $("sub-cat").value;
+      const value = ($("sub-value").value || "").trim();
+      const label = ($("sub-label").value || "").trim();
+      const badge = ($("sub-badge").value || "").trim();
+      const sort = safeInt($("sub-sort").value || "0", 999);
+
+      if(!category_key || !value || !label) return alert("category + value + label obligatoires");
+
+      const group = subcategories.filter(s => s.category_key === category_key);
+      const nextSort = group.length ? Math.max(...group.map(x => x.sort || 1)) + 1 : 1;
+
+      const { error } = await sb.from("subcategories").insert([{
+        category_key,
+        value,
+        label,
+        badge,
+        sort: sort || nextSort
+      }]);
+
+      if(error) return alert(error.message);
+
+      $("sub-value").value = "";
+      $("sub-label").value = "";
+      $("sub-badge").value = "";
+      $("sub-sort").value = "";
+
+      await refreshAll();
+    }
+
+    async function deleteSubcategory(id){
+      if(!confirm("Supprimer la sous-catégorie ?")) return;
+
+      const s = subcategories.find(x => x.id === id);
+      if(!s) return;
+
+      await sb.from("videos").delete().eq("option", s.value);
+
+      const { error } = await sb.from("subcategories").delete().eq("id", id);
+      if(error) return alert(error.message);
+
+      await normalizeSubcategorySort(s.category_key);
+      await refreshAll();
+    }
+
+    function startEditSubcategory(id){
+      editingSubcategoryId = id;
+      renderSubcategories();
+    }
+
+    function cancelEditSubcategory(){
+      editingSubcategoryId = null;
+      renderSubcategories();
+    }
+
+    async function saveEditSubcategory(id){
+      const category_key = $(`edit-sub-cat-${id}`).value;
+      const value = ($(`edit-sub-value-${id}`).value || "").trim();
+      const label = ($(`edit-sub-label-${id}`).value || "").trim();
+      const badge = ($(`edit-sub-badge-${id}`).value || "").trim();
+      const sort = safeInt($(`edit-sub-sort-${id}`).value || "1", 1);
+
+      if(!category_key || !value || !label) return alert("category + value + label obligatoires");
+
+      const old = subcategories.find(x => x.id === id);
+      if(!old) return;
+
+      if(old.value !== value){
+        await sb.from("videos").update({ option: value }).eq("option", old.value);
+      }
+
+      if(old.category_key !== category_key){
+        await sb.from("videos").update({ category: category_key }).eq("option", old.value);
+      }
+
+      const { error } = await sb.from("subcategories").update({
+        category_key, value, label, badge, sort
+      }).eq("id", id);
+
+      if(error) return alert(error.message);
+
+      await normalizeSubcategorySort(old.category_key);
+      await normalizeSubcategorySort(category_key);
+
+      editingSubcategoryId = null;
+      await refreshAll();
+    }
+
+    async function moveSubcategory(id, dir){
+      const s = subcategories.find(x => x.id === id);
+      if(!s) return;
+
+      const group = subcategories
+        .filter(x => x.category_key === s.category_key)
+        .sort((a,b) => a.sort - b.sort);
+
+      const idx = group.findIndex(x => x.id === id);
+      const swap = dir === "up" ? group[idx-1] : group[idx+1];
+      if(!swap) return;
+
+      await sb.from("subcategories").update({ sort: swap.sort }).eq("id", s.id);
+      await sb.from("subcategories").update({ sort: s.sort }).eq("id", swap.id);
+
+      await normalizeSubcategorySort(s.category_key);
+      await refreshAll();
+    }
+
+    async function setSubcategorySort(id){
+      const s = subcategories.find(x => x.id === id);
+      if(!s) return;
+
+      const wanted = prompt("Nouvelle position (sort):", s.sort);
+      if(wanted === null) return;
+
+      await sb.from("subcategories").update({ sort: safeInt(wanted, s.sort) }).eq("id", id);
+      await normalizeSubcategorySort(s.category_key);
+      await refreshAll();
+    }
+
+    // ============================================================
+    // 9) CRUD VIDEOS
+    // ============================================================
+    async function addVideo(){
+      const title = ($("v-title").value || "").trim();
+      const youtube_id = ($("v-youtube").value || "").trim();
+      const category = $("v-category").value;
+      const option = $("v-option").value;
+
+      if(!title || !youtube_id || !category || !option){
+        return alert("Titre + YouTube ID + category + option obligatoires");
+      }
+
+      const group = videos.filter(v => v.category === category && v.option === option);
+      const nextPos = group.length ? Math.max(...group.map(x => x.position || 1)) + 1 : 1;
+
+      const { error } = await sb.from("videos").insert([{
+        title, youtube_id, category, option, position: nextPos
+      }]);
+
+      if(error) return alert(error.message);
+
+      $("v-title").value = "";
+      $("v-youtube").value = "";
+
+      await refreshAll();
+    }
+
+    async function deleteVideo(id){
+      if(!confirm("Supprimer la vidéo ?")) return;
+
+      const v = videos.find(x => x.id === id);
+      if(!v) return;
+
+      const { error } = await sb.from("videos").delete().eq("id", id);
+      if(error) return alert(error.message);
+
+      await normalizeVideoPositionsForGroup(v.category, v.option);
+      await refreshAll();
+    }
+
+    async function moveVideo(id, dir){
+      const v = videos.find(x => x.id === id);
+      if(!v) return;
+
+      const group = videos
+        .filter(x => x.category === v.category && x.option === v.option)
+        .sort((a,b) => a.position - b.position);
+
+      const idx = group.findIndex(x => x.id === id);
+      const swapWith = dir === "up" ? group[idx-1] : group[idx+1];
+      if(!swapWith) return;
+
+      await sb.from("videos").update({ position: swapWith.position }).eq("id", v.id);
+      await sb.from("videos").update({ position: v.position }).eq("id", swapWith.id);
+
+      await normalizeVideoPositionsForGroup(v.category, v.option);
+      await refreshAll();
+    }
+
+    async function setVideoPosition(id){
+      const v = videos.find(x => x.id === id);
+      if(!v) return;
+
+      const wanted = prompt("Nouvelle position (1,2,3...):", v.position);
+      if(wanted === null) return;
+
+      await sb.from("videos").update({ position: safeInt(wanted, v.position) }).eq("id", id);
+      await normalizeVideoPositionsForGroup(v.category, v.option);
+      await refreshAll();
+    }
+
+    function startEditVideo(id){
+      editingVideoId = id;
+      renderVideos();
+    }
+
+    function cancelEditVideo(){
+      editingVideoId = null;
+      renderVideos();
+    }
+
+    function buildEditOptions(categoryKey, selectedValue){
+      const opts = subcategories.filter(s => s.category_key === categoryKey);
+      if(!opts.length) return `<option value="">(Aucune option)</option>`;
+
+      return opts.map(o => `
+        <option value="${o.value}" ${o.value === selectedValue ? "selected" : ""}>
+          ${o.label}
+        </option>
+      `).join("");
+    }
+
+    async function saveEditVideo(id){
+      const title = ($(`edit-title-${id}`).value || "").trim();
+      const youtube_id = ($(`edit-youtube-${id}`).value || "").trim();
+      const category = $(`edit-category-${id}`).value;
+      const option = $(`edit-option-${id}`).value;
+
+      if(!title || !youtube_id || !category || !option){
+        return alert("Tous les champs sont obligatoires");
+      }
+
+      const old = videos.find(v => v.id === id);
+      if(!old) return;
+
+      const movedGroup = (old.category !== category) || (old.option !== option);
+
+      let newPosition = old.position;
+      if(movedGroup){
+        const group = videos.filter(v => v.category === category && v.option === option && v.id !== id);
+        newPosition = group.length ? Math.max(...group.map(x => x.position || 1)) + 1 : 1;
+      }
+
+      const { error } = await sb.from("videos").update({
+        title,
+        youtube_id,
+        category,
+        option,
+        position: newPosition
+      }).eq("id", id);
+
+      if(error) return alert(error.message);
+
+      await normalizeVideoPositionsForGroup(old.category, old.option);
+      await normalizeVideoPositionsForGroup(category, option);
+
+      editingVideoId = null;
+      await refreshAll();
+    }
+
+    // ============================================================
+    // 10) RENDER
+    // ============================================================
+    function renderCategories(){
+      const wrap = $("categories-list");
+      wrap.innerHTML = "";
+
+      const list = [...categories].sort((a,b) => (a.sort||1)-(b.sort||1));
+
+      list.forEach(c => {
+        const isEditing = editingCategoryId === c.id;
+
+        const div = document.createElement("div");
+        div.className = "row flex flex-col md:flex-row md:items-center md:justify-between gap-4";
+
+        if(!isEditing){
+          div.innerHTML = `
+            <div class="space-y-1">
+              <div class="text-sm font-extrabold">${c.label}</div>
+              <div class="tiny">key: <b class="text-zinc-200">${c.key}</b> • sort: <b class="text-zinc-200">${c.sort}</b></div>
             </div>
-            <div class="text-white font-extrabold text-lg leading-tight">${escapeHtml(v.title||"Untitled")}</div>
-            <a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.youtube_id)}" target="_blank" class="text-sm text-purple-300 hover:text-purple-200 font-bold">Preview on YouTube →</a>
-          </div>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <button class="btn-pro btn-neutral" onclick="moveUp(${v.id})" ${disabledUp?"disabled":""}>↑</button>
-          <button class="btn-pro btn-neutral" onclick="moveDown(${v.id})" ${disabledDown?"disabled":""}>↓</button>
-          <button class="btn-pro btn-neutral" onclick="toggleEdit(${v.id})">Modifier</button>
-          <button class="btn-pro btn-danger" onclick="deleteVideo(${v.id})">Supprimer</button>
-        </div>
-      </div>
-      <div id="edit-${v.id}" class="inline-edit hidden">
-        <div class="grid md:grid-cols-4 gap-3">
-          <div><label class="admin-label">Title</label><input id="edit-title-${v.id}" class="admin-input" value="${escapeAttr(v.title)}" /></div>
-          <div><label class="admin-label">YouTube ID</label><input id="edit-youtube-${v.id}" class="admin-input" value="${escapeAttr(v.youtube_id)}" /></div>
-          <div><label class="admin-label">Category</label>
-            <select id="edit-category-${v.id}" class="admin-select" onchange="syncOptionsForEdit(${v.id})">
-              <option value="shorts" ${v.category==="shorts"?"selected":""}>Short Form</option>
-              <option value="long" ${v.category==="long"?"selected":""}>Long Form</option>
-            </select>
-          </div>
-          <div><label class="admin-label">Option</label><select id="edit-option-${v.id}" class="admin-select"></select></div>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-3">
-          <button class="btn-pro btn-primary w-full sm:w-auto" onclick="saveEdit(${v.id})">Save</button>
-          <button class="btn-pro btn-neutral w-full sm:w-auto" onclick="toggleEdit(${v.id})">Cancel</button>
-        </div>
-      </div>
-      `;
-      wrap.appendChild(card);
-      syncOptionsForEdit(v.id);
+
+            <div class="flex flex-wrap gap-2">
+              <button class="btn" onclick="moveCategory(${c.id}, 'up')">⬆️</button>
+              <button class="btn" onclick="moveCategory(${c.id}, 'down')">⬇️</button>
+              <button class="btn" onclick="setCategorySort(${c.id})">🎯 Sort</button>
+              <button class="btn" onclick="startEditCategory(${c.id})">✏️ Modifier</button>
+              <button class="btn btn-danger" onclick="deleteCategory(${c.id})">🗑️</button>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div class="grid md:grid-cols-3 gap-3 w-full">
+              <input id="edit-cat-key-${c.id}" class="input" value="${c.key}" />
+              <input id="edit-cat-label-${c.id}" class="input" value="${c.label}" />
+              <input id="edit-cat-sort-${c.id}" class="input" value="${c.sort}" />
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-primary" onclick="saveEditCategory(${c.id})">💾 Save</button>
+              <button class="btn" onclick="cancelEditCategory()">✖ Cancel</button>
+            </div>
+          `;
+        }
+
+        wrap.appendChild(div);
+      });
+    }
+
+    function renderSubcategories(){
+      const wrap = $("subcategories-list");
+      wrap.innerHTML = "";
+
+      const filterKey = $("filter-sub-cat").value;
+
+      let list = [...subcategories];
+      if(filterKey !== "all") list = list.filter(s => s.category_key === filterKey);
+
+      list.sort((a,b) => {
+        if(a.category_key !== b.category_key) return a.category_key.localeCompare(b.category_key);
+        return (a.sort||1)-(b.sort||1);
+      });
+
+      list.forEach(s => {
+        const isEditing = editingSubcategoryId === s.id;
+        const cat = categories.find(c => c.key === s.category_key);
+
+        const div = document.createElement("div");
+        div.className = "row flex flex-col md:flex-row md:items-center md:justify-between gap-4";
+
+        if(!isEditing){
+          div.innerHTML = `
+            <div class="space-y-1">
+              <div class="text-sm font-extrabold">${s.label}</div>
+              <div class="tiny">
+                category: <b class="text-zinc-200">${cat?.label || s.category_key}</b>
+                • value: <b class="text-zinc-200">${s.value}</b>
+                • badge: <b class="text-zinc-200">${s.badge || "-"}</b>
+                • sort: <b class="text-zinc-200">${s.sort}</b>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button class="btn" onclick="moveSubcategory(${s.id}, 'up')">⬆️</button>
+              <button class="btn" onclick="moveSubcategory(${s.id}, 'down')">⬇️</button>
+              <button class="btn" onclick="setSubcategorySort(${s.id})">🎯 Sort</button>
+              <button class="btn" onclick="startEditSubcategory(${s.id})">✏️ Modifier</button>
+              <button class="btn btn-danger" onclick="deleteSubcategory(${s.id})">🗑️</button>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div class="grid md:grid-cols-5 gap-3 w-full">
+              <select id="edit-sub-cat-${s.id}" class="input">
+                ${categories.map(c => `
+                  <option value="${c.key}" ${c.key === s.category_key ? "selected" : ""}>${c.label}</option>
+                `).join("")}
+              </select>
+              <input id="edit-sub-value-${s.id}" class="input" value="${s.value}" />
+              <input id="edit-sub-label-${s.id}" class="input" value="${s.label}" />
+              <input id="edit-sub-badge-${s.id}" class="input" value="${s.badge || ""}" />
+              <input id="edit-sub-sort-${s.id}" class="input" value="${s.sort}" />
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-primary" onclick="saveEditSubcategory(${s.id})">💾 Save</button>
+              <button class="btn" onclick="cancelEditSubcategory()">✖ Cancel</button>
+            </div>
+          `;
+        }
+
+        wrap.appendChild(div);
+      });
+    }
+
+    function renderVideos(){
+      const wrap = $("videos-list");
+      wrap.innerHTML = "";
+
+      const fCat = $("filter-category").value;
+      const fOpt = $("filter-option").value;
+
+      let list = [...videos];
+      if(fCat !== "all") list = list.filter(v => v.category === fCat);
+      if(fOpt !== "all") list = list.filter(v => v.option === fOpt);
+
+      list.sort((a,b) => {
+        if(a.category !== b.category) return a.category.localeCompare(b.category);
+        if(a.option !== b.option) return a.option.localeCompare(b.option);
+        return (a.position||1)-(b.position||1);
+      });
+
+      $("video-count").textContent = `${list.length} vidéo(s)`;
+
+      list.forEach(v => {
+        const cat = categories.find(c => c.key === v.category);
+        const opt = subcategories.find(s => s.value === v.option);
+        const isEditing = editingVideoId === v.id;
+
+        const div = document.createElement("div");
+        div.className = "row flex flex-col md:flex-row md:items-start md:justify-between gap-4";
+
+        if(!isEditing){
+          div.innerHTML = `
+            <div class="flex flex-col md:flex-row gap-4 md:items-center w-full">
+              <div class="rounded-xl overflow-hidden border border-white/10 w-[150px] h-[84px] bg-black/30">
+                <img src="${getThumb(v.youtube_id)}" alt="thumb" style="width:100%;height:100%;object-fit:cover">
+              </div>
+
+              <div class="space-y-1 w-full">
+                <div class="text-sm font-extrabold">${v.title}</div>
+                <div class="tiny leading-relaxed">
+                  ${cat?.label || v.category}
+                  <span class="muted">•</span>
+                  ${opt?.label || v.option}
+                  <span class="muted">•</span>
+                  <span class="text-zinc-200 font-extrabold">pos ${v.position}</span>
+                  <span class="muted">•</span>
+                  <span class="text-zinc-300 font-bold">${v.youtube_id}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button class="btn" onclick="moveVideo(${v.id}, 'up')">⬆️</button>
+              <button class="btn" onclick="moveVideo(${v.id}, 'down')">⬇️</button>
+              <button class="btn" onclick="setVideoPosition(${v.id})">🎯 Position</button>
+              <button class="btn" onclick="startEditVideo(${v.id})">✏️ Modifier</button>
+              <button class="btn btn-danger" onclick="deleteVideo(${v.id})">🗑️</button>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div class="flex flex-col gap-4 w-full">
+              <div class="grid md:grid-cols-4 gap-3 w-full">
+                <input id="edit-title-${v.id}" class="input" value="${v.title}" />
+                <input id="edit-youtube-${v.id}" class="input" value="${v.youtube_id}" />
+
+                <select id="edit-category-${v.id}" class="input">
+                  ${categories.map(c => `
+                    <option value="${c.key}" ${c.key === v.category ? "selected" : ""}>${c.label}</option>
+                  `).join("")}
+                </select>
+
+                <select id="edit-option-${v.id}" class="input">
+                  ${buildEditOptions(v.category, v.option)}
+                </select>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <button class="btn btn-primary" onclick="saveEditVideo(${v.id})">💾 Save</button>
+                <button class="btn" onclick="cancelEditVideo()">✖ Cancel</button>
+              </div>
+            </div>
+          `;
+
+          setTimeout(() => {
+            const catSel = $(`edit-category-${v.id}`);
+            const optSel = $(`edit-option-${v.id}`);
+
+            catSel.addEventListener("change", () => {
+              optSel.innerHTML = buildEditOptions(catSel.value, "");
+            });
+          }, 0);
+        }
+
+        wrap.appendChild(div);
+      });
+    }
+
+    // ============================================================
+    // 11) REALTIME (only once)
+    // ============================================================
+    let realtimeSubscribed = false;
+
+    function subscribeRealtime(){
+      if(realtimeSubscribed) return;
+      realtimeSubscribed = true;
+
+      sb.channel("admin-live")
+        .on("postgres_changes", { event:"*", schema:"public", table:"videos" }, refreshAll)
+        .on("postgres_changes", { event:"*", schema:"public", table:"categories" }, refreshAll)
+        .on("postgres_changes", { event:"*", schema:"public", table:"subcategories" }, refreshAll)
+        .subscribe();
+    }
+
+    // ============================================================
+    // 12) INIT
+    // ============================================================
+    bootAuth();
+
+    sb.auth.onAuthStateChange((_event, session) => {
+      if(!session){
+        showAuth();
+      }
     });
-  });
-}
-
-/* ===============================
-   ADD / EDIT / DELETE / ORDER / ESCAPERS
-   (Similaire code précédent)
-=============================== */
-function syncOptionsForAdd(){ const cat=document.getElementById("add-category").value; const optSelect=document.getElementById("add-option"); optSelect.innerHTML=""; CATEGORY_OPTIONS[cat].forEach(o=>{ const op=document.createElement("option"); op.value=o.value; op.textContent=o.label; optSelect.appendChild(op); }); }
-function syncOptionsForEdit(id){ const catSelect=document.getElementById(`edit-category-${id}`); const optSelect=document.getElementById(`edit-option-${id}`); if(!catSelect||!optSelect)return; const cat=catSelect.value; const current=videos.find(v=>v.id===id); optSelect.innerHTML=""; CATEGORY_OPTIONS[cat].forEach(o=>{ const op=document.createElement("option"); op.value=o.value; op.textContent=o.label; optSelect.appendChild(op); }); optSelect.value=CATEGORY_OPTIONS[cat].some(o=>o.value===current.option)?current.option:CATEGORY_OPTIONS[cat][0].value; }
-
-async function addVideo(){ const title=document.getElementById("add-title").value.trim(); const youtube_id=document.getElementById("add-youtube").value.trim(); const category=document.getElementById("add-category").value; const option=document.getElementById("add-option").value; if(!youtube_id){ alert("YouTube ID required."); return; } if(!/^[a-zA-Z0-9_-]{6,20}$/.test(youtube_id)){ alert("Invalid YouTube ID."); return; } const sameGroup=videos.filter(v=>v.category===category && v.option===option); const nextPos=sameGroup.length+1; const { error }=await supabaseClient.from("videos").insert([{youtube_id,title:title||null,category,option,position:nextPos}]); if(error){ alert("Supabase error: "+error.message); console.error(error); return; } document.getElementById("add-title").value=""; document.getElementById("add-youtube").value=""; refreshVideos(); }
-
-async function deleteVideo(id){ if(!confirm("Supprimer cette vidéo ?")) return; const { error }=await supabaseClient.from("videos").delete().eq("id",id); if(error){ alert("Supabase error: "+error.message); console.error(error); return; } normalizePositionsPerGroup().then(refreshVideos); }
-function toggleEdit(id){ const el=document.getElementById(`edit-${id}`); if(!el)return; el.classList.toggle("hidden"); syncOptionsForEdit(id); }
-async function saveEdit(id){ const title=document.getElementById(`edit-title-${id}`).value.trim(); const youtube_id=document.getElementById(`edit-youtube-${id}`).value.trim(); const category=document.getElementById(`edit-category-${id}`).value; const option=document.getElementById(`edit-option-${id}`).value; if(!youtube_id){ alert("YouTube ID required."); return; } if(!/^[a-zA-Z0-9_-]{6,20}$/.test(youtube_id)){ alert("Invalid YouTube ID."); return; } const { error }=await supabaseClient.from("videos").update({title:title||null,youtube_id,category,option}).eq("id",id); if(error){ alert("Supabase error: "+error.message); console.error(error); return; } toggleEdit(id); refreshVideos(); }
-
-async function moveUp(id){ const v=videos.find(v=>v.id===id); if(!v)return; const sameGroup=videos.filter(x=>x.category===v.category && x.option===v.option).sort((a,b)=>(a.position??0)-(b.position??0)); const index=sameGroup.findIndex(x=>x.id===id); if(index<=0)return; const neighbor=sameGroup[index-1]; await swapPositions(v,neighbor); refreshVideos(); }
-async function moveDown(id){ const v=videos.find(v=>v.id===id); if(!v)return; const sameGroup=videos.filter(x=>x.category===v.category && x.option===v.option).sort((a,b)=>(a.position??0)-(b.position??0)); const index=sameGroup.findIndex(x=>x.id===id); if(index===-1||index>=sameGroup.length-1)return; const neighbor=sameGroup[index+1]; await swapPositions(v,neighbor); refreshVideos(); }
-async function swapPositions(a,b){ const posA=a.position??0; const posB=b.position??0; const { error:e1}=await supabaseClient.from("videos").update({position:posB}).eq("id",a.id); const { error:e2}=await supabaseClient.from("videos").update({position:posA}).eq("id",b.id); if(e1||e2){ console.error(e1||e2); alert("Error swapping positions."); } }
-
-function escapeHtml(str){ return String(str||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
-function escapeAttr(str){ return String(str||"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
-</script>
+  </script>
 </body>
 </html>
